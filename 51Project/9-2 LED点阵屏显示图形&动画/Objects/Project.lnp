@@ -1,0 +1,8 @@
+".\Objects\main.obj",
+".\Objects\Delay.obj",
+".\Objects\MatrixKey.obj",
+".\Objects\Timer0.obj",
+".\Objects\UART.obj",
+".\Objects\MatrixLED.obj" 
+TO ".\Objects\Project" 
+PRINT(".\Listings\Project.m51") DISABLEWARNING (16) 

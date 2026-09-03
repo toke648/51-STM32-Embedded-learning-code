@@ -1,0 +1,57 @@
+C51 COMPILER V9.54   MAIN                                                                  06/13/2026 21:16:02 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "LCD1602.h"
+   3          #include "Delay.h"
+   4          
+   5          void main(){
+   6   1              LCD_Init();
+   7   1              LCD_ShowChar(1,1,'\'');
+   8   1              LCD_ShowChar(1,2,'\"');
+   9   1              LCD_ShowChar(1,3,0x41);
+  10   1              LCD_ShowChar(1,4,'A');
+  11   1              LCD_ShowString(5,1,"HelloWrold!");
+  12   1              LCD_ShowNum(1,13,255,3);
+  13   1              LCD_ShowSignedNum(1,14,-88,3);
+  14   1              LCD_ShowHexNum(2,7,0xA5,2);
+  15   1              LCD_ShowBinNum(2,8,0xA5,8);
+  16   1              LCD_ShowBinNum(2,9,26,8);
+  17   1              
+  18   1              
+  19   1              //1101 0110 ヨ 1101 1001 ル 1011 1100 シ 1011 0110カ
+  20   1              LCD_ShowChar(2,11,0xD6);
+  21   1              LCD_ShowChar(2,12,0xD9);
+  22   1              LCD_ShowChar(2,13,0xBC);
+  23   1              LCD_ShowChar(2,14,0xB6);
+  24   1              
+  25   1              LCD_ShowChar(2,1,0xDF);
+  26   1              LCD_ShowChar(2,2,'C');
+  27   1              
+  28   1              LCD_ShowString(1,1,"HelloWrold!");
+  29   1              while(1){
+  30   2                      Delay(500);
+  31   2                      LCD_WriteCommand(0x18);
+  32   2          }
+  33   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    201    ----
+   CONSTANT SIZE    =     12    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

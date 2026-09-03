@@ -1,0 +1,62 @@
+C51 COMPILER V9.54   MAIN                                                                  06/15/2026 19:00:05 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          //#include "Delay.h"
+   3          //#include "LCD1602.h"
+   4          #include "Motor.h"
+   5          #include "IR.h"
+   6          #include "Key.h"
+   7          #include "Nixie.h"
+   8          
+   9          unsigned char Num;
+  10          unsigned char Address;
+  11          unsigned char Command;
+  12          
+  13          unsigned char KeyNum;
+  14          unsigned char Speed=0;
+  15          
+  16          void main(){
+  17   1              Motor_Init();
+  18   1              IR_Init();
+  19   1              
+  20   1              Motor_SetSpeed(0);
+  21   1              
+  22   1          while(1){
+  23   2                      if(IR_GetDataFlag()){
+  24   3                              Address=IR_GetAddress();
+  25   3                              Command=IR_GetCommand();  //获取指令
+  26   3                              
+  27   3      //                      LCD_ShowHexNum(2,1,Address,2);
+  28   3      //                      LCD_ShowHexNum(2,7,Command,2);
+  29   3                              
+  30   3                              if(Command==IR_0){Motor_SetSpeed(0);Nixie(1,0);}
+  31   3                              if(Command==IR_1){Motor_SetSpeed(25);Nixie(1,1);}
+  32   3                              if(Command==IR_2){Motor_SetSpeed(50);Nixie(1,2);}
+  33   3                              if(Command==IR_3){Motor_SetSpeed(75);Nixie(1,3);}
+  34   3                              if(Command==IR_4){Motor_SetSpeed(100);Nixie(1,4);}
+  35   3                      }
+  36   2                              
+  37   2          }
+  38   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    114    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

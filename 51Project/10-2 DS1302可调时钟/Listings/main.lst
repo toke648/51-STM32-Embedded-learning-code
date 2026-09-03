@@ -1,0 +1,84 @@
+C51 COMPILER V9.54   MAIN                                                                  06/07/2026 11:27:18 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          #include "LCD1602.h"
+   4          #include "DS1302.h"
+   5          #include "Timer0.h"
+   6          #include "MatrixKey.h"
+   7          
+   8          unsigned char KeyNum, MODE;
+   9          
+  10          void TimeShow(void){
+  11   1              // 读取时间
+  12   1              DS1302_ReadTime();
+  13   1              
+  14   1              // 显示日期：年-月-日
+  15   1              LCD_ShowNum(1, 6, DS1302_Time[0], 2);  // 年
+  16   1              LCD_ShowChar(1, 8, '-');
+  17   1              LCD_ShowNum(1, 9, DS1302_Time[1], 2);  // 月
+  18   1              LCD_ShowChar(1, 11, '-');
+  19   1              LCD_ShowNum(1, 12, DS1302_Time[2], 2); // 日
+  20   1              
+  21   1              // 显示时间：时:分:秒
+  22   1              LCD_ShowNum(2, 6, DS1302_Time[3], 2);  // 时
+  23   1              LCD_ShowChar(2, 8, ':');
+  24   1              LCD_ShowNum(2, 9, DS1302_Time[4], 2);  // 分
+  25   1              LCD_ShowChar(2, 11, ':');
+  26   1              LCD_ShowNum(2, 12, DS1302_Time[5], 2); // 秒
+  27   1              
+  28   1      }
+  29          
+  30          void TimeSet(void){
+  31   1              P2=0x00;
+  32   1      }
+  33          
+  34          void main(){
+  35   1          LCD_Init();
+  36   1          DS1302_Init();
+*** WARNING C206 IN LINE 36 OF main.c: 'DS1302_Init': missing function-prototype
+  37   1          
+  38   1          LCD_ShowString(1, 1, "Date:");
+  39   1          LCD_ShowString(2, 1, "Time:");
+  40   1          
+  41   1          // 首次使用设置时间（设置一次后可以注释掉）
+  42   1          DS1302_SetTime();
+  43   1          
+  44   1          while(1){
+  45   2                      KeyNum=MatrixKey();
+  46   2                      if(KeyNum==1){
+  47   3                              if(MODE==0){MODE=1;}
+  48   3                              else if(MODE==1){MODE=0;}
+  49   3                      
+  50   3                      }switch(MODE){
+  51   3                              case 0:TimeShow();break;
+  52   3                              case 1:TimeSet();break;
+  53   3                      }
+C51 COMPILER V9.54   MAIN                                                                  06/07/2026 11:27:18 PAGE 2   
+
+  54   2      
+  55   2              Delay(100);
+  56   2          }
+  57   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    220    ----
+   CONSTANT SIZE    =     12    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

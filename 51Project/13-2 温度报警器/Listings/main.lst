@@ -1,0 +1,138 @@
+C51 COMPILER V9.54   MAIN                                                                  06/13/2026 14:10:35 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "LCD1602.h"
+   3          #include "DS18820.h"
+   4          #include "Delay.h"
+   5          #include "AT24C02.h"
+   6          #include "Key.h"
+   7          #include "Timer0.h"
+   8          #include "Buzzer.h"
+   9          
+  10          float Temp;          // 原始温度（用于比较）
+  11          float TShow;         // 显示用温度（取绝对值）
+  12          unsigned char TLow = 29;
+  13          unsigned char THigh = 30;
+  14          unsigned char KeyNum;
+  15          
+  16          void main(){
+  17   1          Timer0Init();
+  18   1              Buzzer_Init();
+  19   1          
+  20   1          // 读取EEPROM存储的阈值
+  21   1          THigh = AT24C02_ReadByte(0);
+  22   1          Delay(5);
+  23   1          TLow = AT24C02_ReadByte(1);
+  24   1          
+  25   1          LCD_Init();
+  26   1          LCD_ShowString(1, 1, "T:");
+  27   1          LCD_ShowString(2, 1, "TH:");
+  28   1          LCD_ShowString(2, 9, "TL:");
+  29   1          
+  30   1          while(1){
+  31   2              /* 温度读取显示 */
+  32   2              DS18B20_ConvertT();
+  33   2              Delay(750);                     // 等待转换完成
+  34   2              Temp = DS18B20_ReadT();
+  35   2              
+  36   2              // 显示温度（取绝对值）
+  37   2              TShow = Temp;
+  38   2              if(TShow < 0){
+  39   3                  LCD_ShowChar(1, 3, '-');    // ✅ 用 ShowChar
+  40   3                  TShow = -TShow;
+  41   3              } else {
+  42   3                  LCD_ShowChar(1, 3, '+');
+  43   3              }
+  44   2              LCD_ShowNum(1, 4, (int)TShow, 2);
+  45   2              LCD_ShowChar(1, 6, '.');
+  46   2              LCD_ShowNum(1, 7, (unsigned int)(TShow * 100) % 100, 2);
+  47   2              LCD_ShowChar(1, 9, 'C');
+  48   2              
+  49   2              /* 获取按键值 */
+  50   2              KeyNum = Key();                  // ✅ 直接获取，Key_Loop 在中断中运行
+  51   2              
+  52   2              /* 阈值调整 */
+  53   2              if(KeyNum == 1){
+  54   3                  THigh++;
+C51 COMPILER V9.54   MAIN                                                                  06/13/2026 14:10:35 PAGE 2   
+
+  55   3                  if(THigh > 125) THigh = 125;
+  56   3                  if(THigh <= TLow) THigh = TLow + 1;
+  57   3                  // 保存到EEPROM
+  58   3                  AT24C02_WriteByte(0, THigh);
+  59   3                  Delay(5);
+  60   3              }
+  61   2              if(KeyNum == 2){
+  62   3                  if(THigh > TLow + 1) THigh--;
+  63   3                  AT24C02_WriteByte(0, THigh);
+  64   3                  Delay(5);
+  65   3              }
+  66   2              if(KeyNum == 3){
+  67   3                  if(TLow < THigh - 1) TLow++;
+  68   3                  AT24C02_WriteByte(1, TLow);
+  69   3                  Delay(5);
+  70   3              }
+  71   2              if(KeyNum == 4){
+  72   3                  if(TLow > 0) TLow--;
+  73   3                  AT24C02_WriteByte(1, TLow);
+  74   3                  Delay(5);
+  75   3              }
+  76   2              
+  77   2              /* 显示阈值 */
+  78   2              LCD_ShowNum(2, 4, THigh, 2);
+  79   2              LCD_ShowNum(2, 12, TLow, 2);
+  80   2              
+  81   2              /* 温度报警判断（使用原始 Temp）*/
+  82   2              if(Temp > THigh){
+  83   3                  LCD_ShowString(1, 11, "OV:H");
+  84   3                  Buzzer_Start(500);
+  85   3              } else if(Temp < TLow){
+  86   3                  LCD_ShowString(1, 11, "OV:L");
+  87   3                  Buzzer_Start(500);
+  88   3              } else {
+  89   3                  LCD_ShowString(1, 11, "    ");
+  90   3              }
+  91   2              
+  92   2              Delay(200);
+  93   2          }
+  94   1      }
+  95          
+  96          // 定时器中断（每1ms）
+  97          void Timer0_Routine() interrupt 1{
+  98   1          static unsigned int T0Count = 0;  // ✅ 初始化
+  99   1          TL0 = 0x18;
+ 100   1          TH0 = 0xFC;
+ 101   1          
+ 102   1          T0Count++;
+ 103   1              
+ 104   1              Buzzer_Loop();
+ 105   1              
+ 106   1          if(T0Count >= 20){  // 每20ms执行一次
+ 107   2              T0Count = 0;
+ 108   2              Key_Loop();     // 更新按键状态
+ 109   2          }
+ 110   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    617    ----
+   CONSTANT SIZE    =     26    ----
+   XDATA SIZE       =   ----    ----
+C51 COMPILER V9.54   MAIN                                                                  06/13/2026 14:10:35 PAGE 3   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

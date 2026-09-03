@@ -1,0 +1,69 @@
+C51 COMPILER V9.54   DS18820                                                               06/12/2026 15:59:55 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE DS18820
+OBJECT MODULE PLACED IN .\Objects\DS18820.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE DS18820.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\D
+                    -S18820.lst) OBJECT(.\Objects\DS18820.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "OneWire.h"
+   3          #include "LCD1602.h"
+   4          
+   5          #define DS18B20_SKIP_ROM    0xCC
+   6          #define DS18B20_CONVERT_T   0x44
+   7          #define DS18B20_READ_ROM    0xBE  // 读取温度命令
+   8          
+   9          /**
+  10            * @brief 启动温度转换
+  11            * @param 无
+  12            * @retval 无
+  13            */
+  14          void DS18B20_ConvertT(void){
+  15   1              OneWire_Init();
+  16   1              OneWire_SendByte(DS18B20_SKIP_ROM);
+  17   1              OneWire_SendByte(DS18B20_CONVERT_T);
+  18   1      }
+  19          
+  20          /**
+  21            * @brief 读取温度
+  22            * @param 无
+  23            * @retval 温度值（摄氏度）
+  24            */
+  25          float DS18B20_ReadT(void){
+  26   1              unsigned char TLSB,TMSB;
+  27   1              int Temp;
+  28   1              float T;
+  29   1              OneWire_Init();
+  30   1              OneWire_SendByte(DS18B20_SKIP_ROM);
+  31   1              OneWire_SendByte(DS18B20_READ_ROM);  
+  32   1              
+  33   1          TLSB = OneWire_ReceiveByte();       // 读低8位
+  34   1          TMSB = OneWire_ReceiveByte();       // 读高8位
+  35   1              
+  36   1              LCD_ShowBinNum(1,1,TMSB,8);
+  37   1              LCD_ShowBinNum(1,9,TLSB,8);
+  38   1              
+  39   1          Temp = (TMSB << 8) | TLSB;          // 合并为16位
+  40   1          T = Temp / 16.0;                    // 转换为实际温度
+  41   1              
+  42   1              return T;
+  43   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     89    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.54   DS18820                                                               06/12/2026 15:59:55 PAGE 2   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

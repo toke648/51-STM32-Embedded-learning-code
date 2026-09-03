@@ -1,0 +1,9 @@
+".\Objects\main.obj",
+".\Objects\Delay.obj",
+".\Objects\MatrixKey.obj",
+".\Objects\Timer0.obj",
+".\Objects\Nixie.obj",
+".\Objects\Key.obj",
+".\Objects\Buzzer.obj" 
+TO ".\Objects\Project" 
+PRINT(".\Listings\Project.m51") DISABLEWARNING (16) 

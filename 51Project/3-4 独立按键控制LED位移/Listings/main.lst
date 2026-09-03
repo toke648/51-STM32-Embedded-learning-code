@@ -1,0 +1,175 @@
+C51 COMPILER V9.54   MAIN                                                                  05/31/2026 22:49:51 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX51.H>
+   2          #include <INTRINS.H>
+   3          
+   4          void Dealy(unsigned int xms) {  //@12.000MHz
+   5   1          unsigned char i, j;
+   6   1          while(xms--){
+   7   2                      i = 2;
+   8   2                      j = 239;
+   9   2                      do{
+  10   3                              while(--j);
+  11   3                      }while(--i); // --j和j--的区别是 前置- 和后置-
+  12   2              }
+  13   1      }
+  14          
+  15          //如果有返回类型就不能设置成void空类型了
+  16          unsigned char mul(unsigned char nl){
+  17   1              unsigned char count=1;
+  18   1              int i;
+  19   1              for(i=0;i<=nl;i++){
+  20   2                      count*=2;
+  21   2              }
+  22   1              return count;
+  23   1      }
+  24          
+  25          void main() {
+  26   1      //      P2_0=1; //灭
+  27   1      //      P2_0=0;//亮
+  28   1              
+  29   1              unsigned char num=0;
+  30   1              
+  31   1              unsigned char led=0;
+  32   1              while(1){
+  33   2                              if(P3_1==0){
+  34   3                                      //清除抖动
+  35   3                                      Dealy(20);
+  36   3                                      while(P3_1==0);
+  37   3                                      Dealy(20);
+  38   3                                      
+  39   3      //                              P2++;//P2从0自加到255
+  40   3                                      //因为P2默认定义就是unsigned char类型，最大值为255，超过会自动重置
+  41   3                                      
+  42   3                                      
+  43   3      //                              if(num<255){
+  44   3                                              //通过对正向传递取反实现倒置
+  45   3      //                                      led++;
+  46   3                                      
+  47   3                                                      
+  48   3                                      if(num < 8) num++;else num=0;
+  49   3                                      led=(0x01<<num);
+  50   3                                      
+  51   3                                      P2=~led;
+  52   3                              }
+  53   2                              if(P3_0==0){ //四个按钮的控制位
+  54   3                                      //清除抖动
+C51 COMPILER V9.54   MAIN                                                                  05/31/2026 22:49:51 PAGE 2   
+
+  55   3                                      Dealy(20);
+  56   3                                      while(P3_0==0);
+  57   3                                      Dealy(20);
+  58   3                                      
+  59   3      //                              P2++;//P2从0自加到255
+  60   3                                      //因为P2默认定义就是unsigned char类型，最大值为255，超过会自动重置
+  61   3                                      
+  62   3                                      //通过对正向传递取反实现倒置
+  63   3                                      
+  64   3                                      if(num==0){
+  65   4                                              num=7;
+  66   4                                      }else{
+  67   4                                              num--;
+  68   4                                      }
+  69   3                                      led=(0x01<<num);
+  70   3                                      
+  71   3                                      P2=~led;
+  72   3                              }
+  73   2                      }
+  74   1      }
+  75          
+  76          
+  77          
+  78          //#include <REGX51.H>
+  79          //#include <INTRINS.H>
+  80          
+  81          //void Dealy(unsigned int xms) {  //@12.000MHz
+  82          //    unsigned char i, j;
+  83          //    while(xms--){
+  84          //              i = 2;
+  85          //              j = 239;
+  86          //              do{
+  87          //                      while(--j);
+  88          //              }while(--i); // --j和j--的区别是 前置- 和后置-
+  89          //      }
+  90          //}
+  91          
+  92          ////如果有返回类型就不能设置成void空类型了
+  93          //unsigned char mul(unsigned char nl){
+  94          //      unsigned char count=1;
+  95          //      int i;
+  96          //      for(i=0;i<=nl;i++){
+  97          //              count*=2;
+  98          //      }
+  99          //      return count;
+ 100          //}
+ 101          
+ 102          //void main() {
+ 103          ////    P2_0=1; //灭
+ 104          ////    P2_0=0;//亮
+ 105          //      
+ 106          //      unsigned char num=0;
+ 107          //      
+ 108          //      unsigned char led=0;
+ 109          //      while(1){
+ 110          //                      if(P3_1==0){
+ 111          //                              //清除抖动
+ 112          //                              Dealy(20);
+ 113          //                              while(P3_1==0);
+ 114          //                              Dealy(20);
+ 115          //                              
+ 116          ////                            P2++;//P2从0自加到255
+C51 COMPILER V9.54   MAIN                                                                  05/31/2026 22:49:51 PAGE 3   
+
+ 117          //                              //因为P2默认定义就是unsigned char类型，最大值为255，超过会自动重置
+ 118          //                              
+ 119          //                              
+ 120          ////                            if(num<255){
+ 121          //                                      //通过对正向传递取反实现倒置
+ 122          ////                                    led++;
+ 123          //                              
+ 124          //                                              
+ 125          //                              if(num < 8) num++;else num=0;
+ 126          //                              led=mul(num);
+ 127          //                              
+ 128          //                              P2=~led;
+ 129          //                      }
+ 130          //                      if(P3_0==0){ //四个按钮的控制位
+ 131          //                              //清除抖动
+ 132          //                              Dealy(20);
+ 133          //                              while(P3_0==0);
+ 134          //                              Dealy(20);
+ 135          //                              
+ 136          ////                            P2++;//P2从0自加到255
+ 137          //                              //因为P2默认定义就是unsigned char类型，最大值为255，超过会自动重置
+ 138          //                              
+ 139          //                              //通过对正向传递取反实现倒置
+ 140          //                              
+ 141          //                              if(num > 8) num--;
+ 142          //                              led=mul(num);
+ 143          //                              
+ 144          //                              P2=~led;
+ 145          //                      }
+ 146          //              }
+ 147          //}
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    134    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

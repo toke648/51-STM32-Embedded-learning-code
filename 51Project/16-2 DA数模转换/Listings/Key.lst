@@ -1,0 +1,121 @@
+C51 COMPILER V9.54   KEY                                                                   06/13/2026 22:39:16 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE KEY
+OBJECT MODULE PLACED IN .\Objects\Key.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Key.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\Key.l
+                    -st) OBJECT(.\Objects\Key.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          
+   4          unsigned char Key_Key_Number;
+   5          
+   6          
+   7          unsigned char Key(void){
+   8   1              unsigned char temp = Key_Key_Number;
+   9   1              Key_Key_Number = 0;
+  10   1              return temp;
+  11   1      }
+  12          
+  13          /**
+  14            * @brief  获取独立按键键码
+  15            * @param  无
+  16            * @retval 按下按键的键码，范围：0~4，无按键按下时返回值为0
+  17            */
+  18          /*
+  19                  硬件引脚
+  20                  P3_0, P3_1...
+  21                     ↓
+  22              Key_GetState()    ← 读取硬件状态
+  23                     ↓
+  24              NowState = 结果
+  25                     ↓
+  26              Key_Loop()        ← 比较上次和这次
+  27                     ↓
+  28              检测到松开事件
+  29                     ↓
+  30              存入全局变量
+  31          */
+  32          unsigned char Key_GetState()
+  33          {
+  34   1              unsigned char KeyNumber=0;
+  35   1              
+  36   1              if(P3_1==0){Delay(20);KeyNumber=1;}
+  37   1              if(P3_0==0){Delay(20);KeyNumber=2;}
+  38   1              if(P3_2==0){Delay(20);KeyNumber=3;}
+  39   1              if(P3_3==0){Delay(20);KeyNumber=4;}
+  40   1              
+  41   1              return KeyNumber;
+  42   1      }
+  43          
+  44          
+  45          /*
+  46          状态机工作原理图解
+  47          text
+  48          按键状态变化：
+  49          按下瞬间          松开瞬间
+  50             ↓                ↓
+  51          [未按下] -> [按下] -> [未按下]
+  52             0         1         0
+  53             
+  54          检测逻辑：
+C51 COMPILER V9.54   KEY                                                                   06/13/2026 22:39:16 PAGE 2   
+
+  55          LastState = 0, NowState = 0 → 无动作
+  56          LastState = 0, NowState = 1 → 按下（不处理）
+  57          LastState = 1, NowState = 0 → 松开（记录按键）✓
+  58          
+  59          上一次状态 = 当前状态;      // 保存上一次的情况
+  60          当前状态 = Key_GetState();  // 看看现在谁被按着
+  61          
+  62          如果(上一次有人按 && 现在没人按){
+  63              // 有人松开了！记下来
+  64              全局按键值 = 上一次是谁按的;
+  65          }
+  66          */
+  67          
+  68          
+  69          unsigned char Key_Loop(void){
+  70   1              static unsigned char NowState,LastState;
+  71   1              LastState=NowState; //因为NowState是静态类型，因此会记录上一个状态的数据
+  72   1              NowState=Key_GetState(); //判断是否有按键按下，如果有则返回被按下的按钮号
+  73   1              /*
+  74   1              松手检测，如果上个状态为1，并且现在的状态为0，
+  75   1              if(LastState==1 && NowState==0)
+  76   1              
+  77   1              如果改为，上个状态为0，且如果现在的状态为1，则可以改为按下检测
+  78   1              if(LastState==0 && NowState==1){
+  79   1              */
+  80   1              if(LastState==1 && NowState==0){ //比如，如果上一个人进房间是开了灯的，并且你又点�
+             -��一次灯，就表示灯开了，这部分主要用于判断之前的按钮是否是被按下
+  81   2                      Key_Key_Number=1;
+  82   2              }
+  83   1              if(LastState==2 && NowState==0){
+  84   2                      Key_Key_Number=2;
+  85   2              }
+  86   1              if(LastState==3 && NowState==0){
+  87   2                      Key_Key_Number=3;
+  88   2              }
+  89   1              if(LastState==4 && NowState==0){
+  90   2                      Key_Key_Number=4;
+  91   2              }
+  92   1              
+  93   1              return Key_Key_Number;
+  94   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    115    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

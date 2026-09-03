@@ -1,0 +1,105 @@
+C51 COMPILER V9.54   MAIN                                                                  06/09/2026 18:24:37 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "LCD1602.h"
+   3          #include "Key.h"
+   4          #include "Delay.h"
+   5          #include "AT24C02.h"
+   6          #include "Key.h"
+   7          
+   8          unsigned char Data,Write=123;
+   9          unsigned int KeyNum,Num=0;
+  10          
+  11          void main(){
+  12   1              LCD_Init();
+  13   1              
+  14   1      //      LCD_ShowString(1,1,"HelloWorld!");
+  15   1              
+  16   1      //      //在第一个位置写入内容66
+  17   1      //      
+  18   1      //      //多地址存储
+  19   1      //      AT24C02_WriteByte(0,147);
+  20   1      //      Delay(5);
+  21   1      //      AT24C02_WriteByte(1,147);
+  22   1      //      Delay(5);
+  23   1      //      AT24C02_WriteByte(2,147);
+  24   1      //      
+  25   1      //      Delay(5); //根据数据手册，周期时间从Stop到Start需要有一定时间间隔
+  26   1      //      //读取第一个数据位
+  27   1      //      
+  28   1      //      Data = AT24C02_ReadByte(0x01);//获取第一位数据
+  29   1      //      
+  30   1      //      if(Data==Write){P2=0x00;}else{P2=0xFF;}
+  31   1      //      
+  32   1      //      LCD_ShowNum(2,1,Data,3);
+  33   1              
+  34   1              while(1){
+  35   2                      KeyNum=Key();
+  36   2                      //加
+  37   2                      if(KeyNum==1){
+  38   3                              Num++;
+  39   3                              LCD_ShowNum(1,1,Num,5);
+  40   3                              LCD_ShowString(2, 1, "     ");
+  41   3                      }
+  42   2                      //减
+  43   2                      if(KeyNum==2){
+  44   3                              Num--;
+  45   3                              LCD_ShowNum(1,1,Num,5);
+  46   3                              LCD_ShowString(2, 1, "     ");
+  47   3                      }
+  48   2                      //写
+  49   2                      /*
+  50   2                      因为16进制不能直接读取，因此拆成两部分
+  51   2                      高八位  jnm
+  52   2                      */
+  53   2                      
+  54   2                      /*
+C51 COMPILER V9.54   MAIN                                                                  06/09/2026 18:24:37 PAGE 2   
+
+  55   2                      像这样 54321
+  56   2                      54321 = 1101 0100 0011 0001
+  57   2                      54321%256=212
+  58   2                      212=1101 0100
+  59   2                      54321/256=49
+  60   2                      49=0011 0001
+  61   2                      212<<8=1101 0100 0000 0000
+  62   2                      (212<<8)|49=1101 0100 0011 0001
+  63   2                      */
+  64   2                      if(KeyNum==3){
+  65   3                              AT24C02_WriteByte(0,Num%256);
+  66   3                              Delay(10);
+  67   3                              AT24C02_WriteByte(1,Num/256);
+  68   3                              Delay(10);
+  69   3                              LCD_ShowString(2,1,"Saved");
+  70   3                      }
+  71   2                      //读
+  72   2                      if(KeyNum==4){
+  73   3                              Num=AT24C02_ReadByte(0);
+  74   3                              Num|=AT24C02_ReadByte(1)<<8;
+  75   3                              LCD_ShowNum(1,1,Num,5);
+  76   3                              LCD_ShowString(2,1,"Loaded");
+  77   3                      }
+  78   2              }
+  79   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    208    ----
+   CONSTANT SIZE    =     19    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      6    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,148 @@
+C51 COMPILER V9.54   I2C                                                                   06/13/2026 22:39:16 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE I2C
+OBJECT MODULE PLACED IN .\Objects\I2C.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE I2C.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\I2C.l
+                    -st) OBJECT(.\Objects\I2C.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          
+   3          sbit I2C_SCL=P2^1;
+   4          sbit I2C_SDA=P2^0;
+   5          
+   6          
+   7          /**
+   8            * @brief I2C启动
+   9            * @param void
+  10            * @retval void
+  11            */
+  12          void I2C_Start(void){
+  13   1              //默认总线空闲状态 高电平
+  14   1              I2C_SDA=1;
+  15   1              I2C_SCL=1;
+  16   1              //再将总线拉低，相当于初始化
+  17   1              I2C_SDA=0;
+  18   1              I2C_SCL=0;
+  19   1      
+  20   1      }
+  21          
+  22          /**
+  23            * @brief  I2C停止
+  24            * @param 无
+  25            * @retval 无
+  26            */
+  27          void I2C_Stop(void){
+  28   1              //确保默认状态为零再拉高
+  29   1              I2C_SDA=0;
+  30   1              
+  31   1              //如果时钟频率过快，需要根据手册更改通信速率
+  32   1              I2C_SCL=1;
+  33   1              I2C_SDA=1;
+  34   1              
+  35   1      }
+  36          
+  37          
+  38          /**
+  39            * @brief I2C发送一个字节
+  40            * @param 无
+  41            * @retval 无
+  42            */
+  43          void I2C_SendByte(unsigned char Byte){
+  44   1              unsigned char i;
+  45   1              //直接通过位移操作，更新内容
+  46   1              for(i=0;i<8;i++){
+  47   2                      I2C_SDA = (Byte & (0x80>>i)) ? 1 : 0;
+  48   2              //      I2C_SDA=Byte&0x80; // 1111 0000 将SDA状态改为最高位
+  49   2                      //置高，然后再置低
+  50   2                      I2C_SCL=1;
+  51   2                      I2C_SCL=0;
+  52   2              }
+  53   1      }
+  54          
+C51 COMPILER V9.54   I2C                                                                   06/13/2026 22:39:16 PAGE 2   
+
+  55          
+  56          /**
+  57            * @brief I2C接受一个字节
+  58            * @param 无
+  59            * @retval 接受到的一个字节的数据
+  60            */
+  61          unsigned char I2C_ReceiveByte(void)
+  62          {
+  63   1              unsigned char i;
+  64   1               unsigned char Byte = 0x00;
+  65   1              
+  66   1              // 先置1释放总线
+  67   1              I2C_SDA=1;
+  68   1              
+  69   1              for(i=0;i<8;i++){
+  70   2                       Byte <<= 1;
+  71   2                      //读取前先拉高
+  72   2                      I2C_SCL=1;
+  73   2                      // 1010 0000 | 1111 0000 = 1111 0000
+  74   2                      if(I2C_SDA){Byte |= 0x01;}
+  75   2                      I2C_SCL=0;//拉高后状态改为等待状态
+  76   2              }
+  77   1              
+  78   1              
+  79   1              return Byte;
+  80   1      }
+  81          
+  82          //变量bit 1位，只能存储0/1
+  83          //unsigned -127 —— 127
+  84          /**
+  85            * @brief I2C发送应答
+  86          * @param AckBit 应答为，0为应答，1为非应答
+  87            * @retval 无
+  88            */
+  89          void I2C_SendAck(unsigned char AckBit){
+  90   1              I2C_SDA=AckBit;
+  91   1              I2C_SCL=1;
+  92   1              I2C_SCL=0;
+  93   1      }
+  94          
+  95          /*SDA控制权交给从机后，从机就会把SDA置1或0（从机发送应答，主机接受应答）
+  96          主机接受应答时，从机时自动发送应答的，不是外面操作从机做出什么应答
+  97          
+  98          SCL为主机
+  99          SDA为从机
+ 100          
+ 101          sda=1是主机释放控制权，运行到ackbit=sda的时候sda已经接收到设备应答回来的0了，
+             -已经变了
+ 102          就是说数据一直在SDA上，应答数据也在SDA上，发送应答是主机去应答，接受是从�
+             -��的应答读给ack给主机
+ 103          要想明白这个总线不是一直在主机的控制，从机也可以控制的啊，所以这里只需�
+             -��重置SDA，就相当于放手，把控制权交给从机，然后我们读SDA就行了
+ 104          */
+ 105          /**
+ 106            * @brief I2C接受应答
+ 107            * @param void
+ 108            * @retval AckBit接受到的应答位，0为应答，1为非应答
+ 109            */
+ 110          unsigned char I2C_ReceiveAck(void){
+ 111   1              unsigned char AckBit;
+ 112   1              I2C_SDA=1; //先释放
+ 113   1              I2C_SCL=1;//再拉高
+C51 COMPILER V9.54   I2C                                                                   06/13/2026 22:39:16 PAGE 3   
+
+ 114   1              AckBit=I2C_SDA;
+ 115   1              I2C_SCL=0;
+ 116   1              return AckBit;
+ 117   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    105    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
